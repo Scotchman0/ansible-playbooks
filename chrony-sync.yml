@@ -1,0 +1,25 @@
+---
+- name: setting chrony service on remote host
+  hosts: all
+  become: true
+  tasks:
+    - name: Chrony check and fix
+      block:
+        - name: check for chrony sync
+          command: chronyc -c sources
+          register: get-some-data #random variable from the output
+          failed_when: '"*" not in get-some-data.stdout'
+          changed_when: false # do not need this to register a change
+      rescue:
+        - name: make sure we are using correct server
+          lineinfile:
+            path: /etc/chrony.conf
+            regexp: '172\.25\.254\.254' #Example IP desired
+            line: 'server 172.25.254.254 iburst' # add the line if it's not found
+          notify: restart chronyd
+
+  handlers:
+    - name: restart chronyd
+      service:
+        name: chronyd
+        state: restarted

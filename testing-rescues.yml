@@ -1,0 +1,20 @@
+---
+- name: testing a rescue block
+  hosts: localhost
+  tasks:
+    - name: starting the block
+      block:
+        - debug:
+          msg: 1st task in the block
+        - fail:
+          msg: forcing a fail
+        - debug:
+          msg: one more task
+      rescue:
+        - debug:
+          msg: this is rescue alt
+        - fail:
+            msg: failing a rescue
+      always:
+        - debug:
+          msg: runs no matter what
