@@ -1,6 +1,0 @@
-[production]
-emboleye1 ANSIBLE_HOST=192.168.0.222
-emboleye2 ANSIBLE_HOST=192.168.0.223 ansible_ssh_port==23
-emboleye3 ANSIBLE_HOST=192.168.0.224
-
-[test]
