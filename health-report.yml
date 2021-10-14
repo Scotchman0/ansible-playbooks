@@ -1,0 +1,40 @@
+---
+# Ansible playbook to report the following on target hosts:
+# uptime
+# Software patch version/available updates
+# Local Storage df -h
+# timeservers are synced
+# services are up [mongodb, docker,]
+# local backups have executed as desired
+
+- name: Play to check health of endpoints
+  hosts: production
+  tasks:
+#  - name: Ensure /etc/motd banner is set correctly
+#    copy:
+#      content: "Managed by Ansible\n"
+#      dest: /etc/motd
+  
+  - name: uptime requested
+    command: uptime
+  - debug: space.stdout_lines
+
+  - name: get local storage update
+    command: df -h
+    register: space
+  - debug:
+        var: space.stdout_lines
+
+  - name: mongod is enabled and started
+    service:
+      name: mongodb
+      enabled: true
+      state: started
+
+  - name: host service backups have run recently
+    service:
+      name: veeam
+      enabled: true
+      state: started
+   
+  - name: 

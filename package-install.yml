@@ -1,0 +1,20 @@
+---
+- name: Play to install database systems
+  hosts: production
+  vars:
+    package: mongodb
+  tasks:
+    - name: Install the package
+      yum:
+        name: " {{ package }}"
+        state: present
+        register: capture
+        become: true
+
+    - name: see output of yum module
+      debug:
+        var: capture
+    
+    - name: see just the exit status with a subkey
+      debug:
+        var: capture.rc
