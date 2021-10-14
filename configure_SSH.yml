@@ -1,0 +1,22 @@
+---
+- name: Set SSHD configuration/disable root login
+  hosts: new_units
+  become: true
+  tasks:
+    - name: configure the sshd service
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^PermitRootLogin" #replace matching or add lineif missing
+        line: "PermitRootLogin no"
+      notify:
+        - Restart sshd
+     
+    - name: display update message
+      debug:
+        msg: SSHD has been configured
+  
+  handlers:
+    - name: Restart sshd
+      service:
+        name: sshd
+        state: restarted
