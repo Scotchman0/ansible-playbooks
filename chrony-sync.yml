@@ -17,7 +17,12 @@
             regexp: '172\.25\.254\.254' #Example IP desired
             line: 'server 172.25.254.254 iburst' # add the line if it's not found
           notify: restart chronyd
-
+      always:
+        - name: a message to user
+          debug:
+            msg: |
+              if you saw no task errors, box is in sync.
+              If check failed, we have done our best to fix.
   handlers:
     - name: restart chronyd
       service:
