@@ -1,0 +1,21 @@
+---
+- name: create a custom location for your websites
+  hosts: 
+  become: true
+  tasks:
+    - name: set SELinux context rule persistently
+      sefcontext:
+        target: '/vhosts(/.*)?'
+        setype: httpd_sys_content_t
+        state: present
+
+    - name: create the custom dir
+      file:
+        path: /vhosts
+        state: directory
+        owner: root
+        group: apache
+        mode: '2770'
+        setype: _default # behaves like restrorecon
+
+
