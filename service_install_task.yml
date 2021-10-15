@@ -1,0 +1,11 @@
+---
+- name: service package is installed
+  yum:
+    name: {{ package }}
+    state: latest
+
+- name: service package is running:
+  service:
+    name: {{ service }}
+    enabled: true
+    state: started

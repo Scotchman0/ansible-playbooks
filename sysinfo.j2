@@ -1,0 +1,22 @@
+{# filename: sysinfo.j2 #}
+
+SYSTEM INFO - {{ ansible_facts['fqdn'] }}
+
+Some variables set for this system:
+Pacakge to install: {{ package }}
+
+List of drives:
+{% for drive in ansible_facts['devices'] %}
+  {{ loop.index }} - {{ drive }} with size of {{ ansible_facts['devices'][drive]['size'] }}
+{% endfor %}
+
+Memory Details:
+{% if ansible_facts['memtotal_mb'] > 2048 %}
+Looks like you have more than 2GB installed
+{% else %}
+less than 2B memory installed - performance may be degraded.
+{% endif %}
+
+{# An alternative if statement #}
+Processor type: {{ 'Intel' if ansible_facts.architecture == 'x86_64' else 'Uncommon' }}
+
