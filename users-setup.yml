@@ -1,0 +1,16 @@
+---
+- name: play to create a new user
+  hosts:
+  become: true
+  tasks:
+    - name: Create the user {{ new_user }} account
+      user:
+        name: "{{ new_user }}"
+        state: present
+        password: "{{ 'redhat' | password_hash('sha512') }}"
+
+    - name: set up keybased authentication for {{ new_user }}
+      authorized_key:
+        user: "{{ new_user }}"
+        key: "{{ lookup('file', '~/.ssh/lab_rsa.pub') }}"
+
