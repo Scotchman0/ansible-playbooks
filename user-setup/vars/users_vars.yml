@@ -1,0 +1,7 @@
+---
+# populate the users list with usernames you intend to push, plus include admin group if sudo is needed
+users:
+  - username: testuser
+    groups: admin
+  - username: testuser2
+    groups: admin
