@@ -1,0 +1,40 @@
+---
+- name: configure LVM volumes
+  hosts:
+  become: true
+  tasks:
+    - name: first partition created
+      parted:
+        device: /dev/vdb
+        number: 1
+        part_start: 1MiB
+        part_end: 512MiB
+        flags:
+          - lvm
+
+    - name: "Volume group: vg1 created"
+      lvg:
+        vg: vg1
+        pvs: /dev/vdb1
+        pesize: 4M
+
+    - name: "logical volume: lv_1 created"
+      lvol:
+        vg: vg1
+        lv: lv_1
+        size: 200M
+
+    - name: filesystem applied to lv_1
+      filesystem:
+        dev: /dev/vg1/lv_1
+        fstype: xfs
+
+    - name: lv_1 mounted persistently
+      mount:
+        src: /dev/vg1/lv_1
+        path: /mnt/logs_new
+        opts: defaults
+        dump: "0"
+        passno: "0"
+        state: mounted
+
