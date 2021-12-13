@@ -1,0 +1,43 @@
+---
+- name: playbook to deploy necessary softwares for AV and alerting
+  hosts: production
+  become: yes
+  tasks:
+
+    - name: clamav is installed
+      apt:
+        name: clamav
+        state: latest
+    - name: clamav-freshclam is installed
+      apt:
+        name: clamav-freshclam
+        state: latest
+    - name: clamav-freshclam service is running
+      service:
+        name: clamav-freshclam
+        enabled: true
+        state: started
+
+- name: playbook to deploy daily scanning script
+  hosts: production
+  become: true
+  tasks:
+    
+    - name: clamscan-daily is copied to root
+      copy:
+        src: assets/clamscan-daily.sh
+        dest: /root/clamscan-daily.sh
+        mode: 0755
+    - name: hardlink is established for daily-scanning
+      ansible.builtin.file:
+        src: /root/clamscan-daily.sh
+        dest: /etc/cron.daily/clamscan-daily.sh
+        state: hard
+    - name: quarantine folder exists for isolation
+      file:
+        path: /quarantine
+        state: directory
+    - name: dummy file exists in /quarantine
+      file:
+        path: /quarantine/dummy
+        state: touch
