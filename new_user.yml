@@ -1,0 +1,30 @@
+---
+#validated
+#Run this playbook with -e new_user=<username> appended or substitute below
+- name: play to create a new user
+  hosts: 
+  become: true
+  tasks:
+    - name: Create the user {{ new_user }} account
+      user:
+        name: "{{ new_user }}"
+        state: present
+        password: "{{ 'temporary_new_password' | password_hash('sha512') }}"
+        groups: "docker,admin"
+#generate a 'new_rsa.pub' with ssh-keygen and place in /assets for acquisition, then provide the keyfile to new user (they can create a different one later)
+    - name: set up keybased authentication for {{ new_user }}
+      authorized_key:
+        user: "{{ new_user }}"
+        state: present
+        key: "{{ lookup('file', './assets/{{ new_user }}.pub') }}"
+
+    - name: append sshd_config with authorizedUsers {{ new_user }}
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: 'AllowUsers {{ new_user }}'
+        insertafter: 'AllowUsers'
+ 
+    - name: reload sshd
+      service:
+        name: sshd
+        state: reloaded

@@ -1,0 +1,31 @@
+---
+#Run this playbook with -e new_user=<username> appended or substitute below
+- name: play to create a new user
+  hosts: production
+  become: true
+  tasks:
+    - name: Create the ansible account
+      user:
+        name: "ansible"
+        state: present
+        groups: "sudo"
+        password: "{{ '<redacted>' | password_hash('sha512') }}"
+        comment: "remote management user account for setup"
+
+#generate a 'new_rsa.pub' with ssh-keygen and place in /assets for acquisition, then provide the keyfile to new user (they can create a different one later)
+    - name: set up keybased authentication for ansible
+      authorized_key:
+        user: ansible
+        state: present
+        key: "{{ lookup('file', './assets/ansible.pub') }}"
+
+    - name: append sshd_config with authorizedUsers ansible
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: 'AllowUsers ansible'
+        insertafter: 'AllowUsers'
+
+    - name: reload sshd
+      service:
+        name: sshd
+        state: reloaded

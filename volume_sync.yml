@@ -1,0 +1,26 @@
+---
+#playbook to syncronize the /mnt/data volumes across nodes
+- name: Volume Syncronization Playbook - executed on destination host emboleye2
+  hosts: nodeA
+  become: false
+  tasks:
+  
+  - name: check if target file exists
+    stat:
+      path: "/tmp/testdir/testfile"
+    register: filestatus
+
+  - name: copy the directories from nodeA to nodeB - only the data disks using push
+    synchronize:
+      src: /tmp/testdir
+      dest: /tmp/
+      mode: pull
+    delegate_to: "nodeB"
+    register: syncfile
+    when: filestatus.stat.exists
+
+  - name: debug syncfile
+    debug:
+      msg: "{{ syncfile.changed }}"
+
+#Supported parameters include: _local_rsync_password, _local_rsync_path, _substitute_controller, archive, checksum, compress, copy_links, delete, dest, dest_port, dirs, existing_only, group, link_dest, links, mode, owner, partial, perms, private_key, recursive, rsync_opts, rsync_path, rsync_timeout, set_remote_user, src, ssh_args, times, verify_host

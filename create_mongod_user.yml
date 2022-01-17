@@ -1,0 +1,16 @@
+---
+# validated
+# https://docs.ansible.com/ansible/latest/collections/community/mongodb/mongodb_user_module.html
+- name: playbook to create a user for mongodb
+  hosts: emboleye
+  become: true
+  tasks:
+    - name: Add a user to default database with name {{ new_user }} and password {{ new_password }}
+      community.mongodb.mongodb_user:
+        login_user: wradmin
+        login_password: 
+        database: coread
+        name: "{{ new_user }}"
+        password: "{{ new_password }}"
+        state: present
+        roles: readWrite
